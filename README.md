@@ -20,6 +20,8 @@ Trunk Based Development
 6. online receiver lantern sends message to offline receiver
 7. offline receiver layer-1 decrypts payload
 
+![lanterns architecture](assets/lanterns-architecture.png)
+
 ## License
 
 MIT
