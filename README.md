@@ -12,15 +12,17 @@ Trunk Based Development
 
 ## Architecture
 
-1. offline sender layer-1 encrypts payload
-2. offline sender sends payload to online sender lantern
-3. online sender lantern layer-2 encrypts payload
-4. online sender lantern sends payload to online receiver lantern
-5. online receiver lantern layer-2 decrypts message
-6. online receiver lantern sends message to offline receiver
-7. offline receiver layer-1 decrypts payload
-
 ![lanterns architecture](assets/lanterns-architecture.png)
+
+### Payload Workflow
+
+1. Offline Sender layer *n* encrypts payload
+2. Offline Sender sends payload to Online Sender (Bluetooth)
+3. Online Sender layer *0* encrypts payload
+4. Online Sender sends payload to Online Receiver
+5. Online Receiver layer *0* decrypts payload
+6. Online Receiver sends payload to Offline Receiver (Bluetooth)
+7. Offline Receiver layer *n* decrypts payload
 
 ## License
 
