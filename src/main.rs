@@ -2,37 +2,54 @@ use std::error::Error;
 use std::time::Duration;
 use std::thread;
 
-use blurz::bluetooth_adapter::BluetoothAdapter as Adapter;
-use blurz::bluetooth_device::BluetoothDevice as Device;
-use blurz::bluetooth_session::BluetoothSession as Session;
-use blurz::bluetooth_discovery_session::BluetoothDiscoverySession as DiscoverySession;
+use blurz::{
+    BluetoothAdapter,
+    BluetoothSession,
+    BluetoothDiscoverySession,
+    BluetoothDevice,
+};
 
-fn print_devices() -> Result<(), Box<dyn Error>> {
-    let bt_session = &Session::create_session(None)?;
-    let adapter: Adapter = Adapter::init(bt_session)?;
+fn create_bluetooth_session() -> Result<(
+    BluetoothAdapter,
+    BluetoothSession,
+    BluetoothDiscoverySession
+), dyn Error> {
+    let session = BluetoothSession::create_session(None)?;
+
+    let adapter = BluetoothAdapter::init(&session)?;
     adapter.set_powered(true)?;
 
-    let session = DiscoverySession::create_session(
-        &bt_session,
+    let disc_session = BluetoothDiscoverySession::create_session(
+        &session,
         adapter.get_id()
     )?;
+
+    Ok((adapter, session, disc_session))
+}
+
+fn get_devices(
+    adapter: &BluetoothAdapter,
+    disc_session: &BluetoothDiscoverySession
+) -> Result<Vec<String>, dyn Error> {
     thread::sleep(Duration::from_millis(200));
-    session.start_discovery()?;
+    disc_session.start_discovery()?;
     thread::sleep(Duration::from_millis(2000));
-    let devices = adapter.get_device_list()?;
 
-    for device in devices {
-        let device = Device::new(bt_session, device.clone());
-
-        println!("{}", device.get_name()?)
-    }
-
-    Ok(())
+    Ok(adapter.get_device_list()?)
 }
 
 fn main() {
-    match print_devices() {
-        Ok(_) => (),
-        Err(e) => println!("{:?}", e),
+    let (
+        adapter,
+        session,
+        disc_session
+    ) = create_bluetooth_session()?;
+
+    let devices = get_devices(&adapter, &disc_session)?;
+
+    for device in devices {
+        let device = Device::new(&session, device.clone());
+
+        println!("{}", device.get_name()?)
     }
 }
