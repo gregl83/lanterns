@@ -1,53 +1,38 @@
 use std::error::Error;
-use std::time::Duration;
-use std::thread;
+use std::io;
 
-use blurz::{
-    BluetoothAdapter,
-    BluetoothSession,
-    BluetoothDiscoverySession,
-    BluetoothDevice,
+use blurz::BluetoothDevice;
+
+use self::util::{
+    event::{Event, Events},
+    StatefulList,
+};
+use termion::{event::Key, input::MouseTerminal, raw::IntoRawMode, screen::AlternateScreen};
+use tui::{
+    backend::TermionBackend,
+    layout::{Constraint, Corner, Direction, Layout},
+    style::{Color, Modifier, Style},
+    text::{Span, Spans},
+    widgets::{Block, Borders, List, ListItem},
+    Terminal,
 };
 
-fn create_bluetooth_session() -> Result<BluetoothSession, Box<dyn Error>> {
-    Ok(BluetoothSession::create_session(None)?)
-}
+use lanterns::{
+    create_bluetooth_session,
+    create_bluetooth_adapter,
+    create_bluetooth_discovery_session,
+    get_bluetooth_devices,
+    App,
+};
 
-fn create_bluetooth_adapter(session: &BluetoothSession) -> Result<BluetoothAdapter, Box<dyn Error>> {
-    let adapter = BluetoothAdapter::init(session)?;
-    adapter.set_powered(true)?;
-    Ok(adapter)
-}
-
-fn create_bluetooth_discovery_session<'a>(
-    session: &'a BluetoothSession,
-    adapter: &'a BluetoothAdapter
-) -> Result<BluetoothDiscoverySession<'a>, Box<dyn Error>> {
-    Ok(BluetoothDiscoverySession::create_session(
-        session,
-        adapter.get_id()
-    )?)
-}
-
-fn get_devices(
-    adapter: &BluetoothAdapter,
-    disc_session: &BluetoothDiscoverySession
-) -> Result<Vec<String>, Box<dyn Error>> {
-    thread::sleep(Duration::from_millis(200));
-    disc_session.start_discovery()?;
-    thread::sleep(Duration::from_millis(5000));
-
-    Ok(adapter.get_device_list()?)
-}
-
-fn main() {
+fn main() -> Result<(), Box<dyn Error>> {
     let session = create_bluetooth_session().unwrap();
     let adapter = create_bluetooth_adapter(&session).unwrap();
     let disc_session = create_bluetooth_discovery_session(&session, &adapter).unwrap();
 
     println!("Searching for bluetooth devices...");
 
-    let devices = get_devices(&adapter, &disc_session).unwrap();
+    let devices = get_bluetooth_devices(&adapter, &disc_session).unwrap();
 
     println!("Found:");
 
@@ -56,4 +41,108 @@ fn main() {
         let name = device.get_name().unwrap();
         println!("\t{}", name);
     }
+
+    // ---
+
+    // Terminal initialization
+    let stdout = io::stdout().into_raw_mode()?;
+    let stdout = MouseTerminal::from(stdout);
+    let stdout = AlternateScreen::from(stdout);
+    let backend = TermionBackend::new(stdout);
+    let mut terminal = Terminal::new(backend)?;
+
+    let events = Events::new();
+
+    // App
+    let mut app = App::new();
+
+    loop {
+        terminal.draw(|f| {
+            let chunks = Layout::default()
+                .direction(Direction::Horizontal)
+                .constraints([Constraint::Percentage(50), Constraint::Percentage(50)].as_ref())
+                .split(f.size());
+
+            let items: Vec<ListItem> = app
+                .items
+                .items
+                .iter()
+                .map(|i| {
+                    let mut lines = vec![Spans::from(i.0)];
+                    for _ in 0..i.1 {
+                        lines.push(Spans::from(Span::styled(
+                            "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                            Style::default().add_modifier(Modifier::ITALIC),
+                        )));
+                    }
+                    ListItem::new(lines).style(Style::default().fg(Color::Black).bg(Color::White))
+                })
+                .collect();
+            let items = List::new(items)
+                .block(Block::default().borders(Borders::ALL).title("List"))
+                .highlight_style(
+                    Style::default()
+                        .bg(Color::LightGreen)
+                        .add_modifier(Modifier::BOLD),
+                )
+                .highlight_symbol(">> ");
+            f.render_stateful_widget(items, chunks[0], &mut app.items.state);
+
+            let events: Vec<ListItem> = app
+                .events
+                .iter()
+                .map(|&(evt, level)| {
+                    let s = match level {
+                        "CRITICAL" => Style::default().fg(Color::Red),
+                        "ERROR" => Style::default().fg(Color::Magenta),
+                        "WARNING" => Style::default().fg(Color::Yellow),
+                        "INFO" => Style::default().fg(Color::Blue),
+                        _ => Style::default(),
+                    };
+                    let header = Spans::from(vec![
+                        Span::styled(format!("{:<9}", level), s),
+                        Span::raw(" "),
+                        Span::styled(
+                            "2020-01-01 10:00:00",
+                            Style::default().add_modifier(Modifier::ITALIC),
+                        ),
+                    ]);
+                    let log = Spans::from(vec![Span::raw(evt)]);
+                    ListItem::new(vec![
+                        Spans::from("-".repeat(chunks[1].width as usize)),
+                        header,
+                        Spans::from(""),
+                        log,
+                    ])
+                })
+                .collect();
+            let events_list = List::new(events)
+                .block(Block::default().borders(Borders::ALL).title("List"))
+                .start_corner(Corner::BottomLeft);
+            f.render_widget(events_list, chunks[1]);
+        })?;
+
+        match events.next()? {
+            Event::Input(input) => match input {
+                Key::Char('q') => {
+                    break;
+                }
+                Key::Left => {
+                    app.items.unselect();
+                }
+                Key::Down => {
+                    app.items.next();
+                }
+                Key::Up => {
+                    app.items.previous();
+                }
+                _ => {}
+            },
+            Event::Tick => {
+                app.advance();
+            }
+        }
+    }
+
+    Ok(())
 }
