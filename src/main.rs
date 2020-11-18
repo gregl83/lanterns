@@ -48,7 +48,7 @@ use lanterns::{
     create_bluetooth_session,
     create_bluetooth_adapter,
     create_bluetooth_discovery_session,
-    get_bluetooth_devices,
+    get_bluetooth_device_paths,
 };
 
 struct App<'a> {
@@ -74,14 +74,17 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     println!("Searching for bluetooth devices...");
 
-    let devices = get_bluetooth_devices(&adapter, &disc_session).unwrap();
-
-    let mut device_names = vec![];
-    for device in devices {
-        let device = BluetoothDevice::new(&session, device.clone());
-        let name = device.get_name().unwrap();
-        device_names.push(name.as_str());
-    }
+    let device_paths = get_bluetooth_device_paths(&adapter, &disc_session).unwrap();
+    let devices: Vec<BluetoothDevice> = device_paths.iter().map(|device_path| {
+        BluetoothDevice::new(&session, device_path.clone())
+    }).collect();
+    let device_names: Vec<String> = devices.iter().map(|device| {
+        let device_name = device.get_name().unwrap();
+        device_name.clone()
+    }).collect();
+    let device_names_str: Vec<&str> = device_names.iter().map(|device_name| {
+        device_name.as_str()
+    }).collect();
 
     // Terminal initialization
     let stdout = io::stdout().into_raw_mode()?;
@@ -93,7 +96,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let events = Events::new();
 
     // App
-    let mut app = App::new(device_names);
+    let mut app = App::new(device_names_str);
 
     loop {
         terminal.draw(|f| {

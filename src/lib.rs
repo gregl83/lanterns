@@ -28,7 +28,7 @@ pub fn create_bluetooth_discovery_session<'a>(
     )?)
 }
 
-pub fn get_bluetooth_devices(
+pub fn get_bluetooth_device_paths(
     adapter: &BluetoothAdapter,
     disc_session: &BluetoothDiscoverySession
 ) -> Result<Vec<String>, Box<dyn Error>> {
