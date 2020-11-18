@@ -75,10 +75,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("Searching for bluetooth devices...");
 
     let device_paths = get_bluetooth_device_paths(&adapter, &disc_session).unwrap();
-    let devices: Vec<BluetoothDevice> = device_paths.iter().map(|device_path| {
-        BluetoothDevice::new(&session, device_path.clone())
-    }).collect();
-    let device_names: Vec<String> = devices.iter().map(|device| {
+    let device_names: Vec<String> = device_paths.iter().map(|device_path| {
+        let device = BluetoothDevice::new(&session, device_path.clone());
         let device_name = device.get_name().unwrap();
         device_name.clone()
     }).collect();
