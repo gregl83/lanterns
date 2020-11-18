@@ -16,13 +16,13 @@ Trunk Based Development
 
 ### Payload Workflow
 
-1. Offline Sender layer *n* encrypts payload
-2. Offline Sender sends payload to Online Sender (Bluetooth)
-3. Online Sender layer *0* encrypts payload
-4. Online Sender sends payload to Online Receiver
-5. Online Receiver layer *0* decrypts payload
-6. Online Receiver sends payload to Offline Receiver (Bluetooth)
-7. Offline Receiver layer *n* decrypts payload
+1. Offline Sender Terminal layer *0* encrypts payload
+2. Offline Sender Terminal sends payload to Online Sender Lantern
+3. Online Sender Lantern layer *1* encrypts payload
+4. Online Sender Lantern sends payload to Online Receiver Lantern
+5. Online Receiver Lantern layer *1* decrypts payload
+6. Online Receiver Lantern sends payload to Offline Receiver Lantern
+7. Offline Receiver Lantern layer *0* decrypts payload
 
 ## License
 
