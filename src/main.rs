@@ -1,7 +1,7 @@
 #[allow(dead_code)]
 mod util;
+mod io;
 
-use std::io;
 use std::error::Error;
 
 use termion::{
@@ -44,7 +44,7 @@ use crate::util::{
 
 use blurz::BluetoothDevice;
 
-use lanterns::{
+use crate::io::adapters::{
     create_bluetooth_session,
     create_bluetooth_adapter,
     create_bluetooth_discovery_session,
@@ -87,7 +87,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     }).collect();
 
     // Terminal initialization
-    let stdout = io::stdout().into_raw_mode()?;
+    let stdout = std::io::stdout().into_raw_mode()?;
     let stdout = MouseTerminal::from(stdout);
     let stdout = AlternateScreen::from(stdout);
     let backend = TermionBackend::new(stdout);
