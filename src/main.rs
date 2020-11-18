@@ -1,6 +1,7 @@
 #[allow(dead_code)]
 mod util;
 mod io;
+mod gui;
 
 use std::error::Error;
 
@@ -34,6 +35,7 @@ use tui::{
     Terminal,
 };
 
+use crate::gui::Application;
 use crate::util::{
     event::{
         Event,
@@ -50,22 +52,6 @@ use crate::io::adapters::{
     create_bluetooth_discovery_session,
     get_bluetooth_device_paths,
 };
-
-struct App<'a> {
-    devices: StatefulList<&'a str>,
-}
-
-impl<'a> App<'a> {
-    fn new(devices: Vec<&'a str>) -> App<'a> {
-        App {
-            devices: StatefulList::with_items(devices),
-        }
-    }
-
-    fn advance(&mut self) {
-        // todo - on frame
-    }
-}
 
 fn main() -> Result<(), Box<dyn Error>> {
     let session = create_bluetooth_session().unwrap();
@@ -94,7 +80,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let events = Events::new();
 
     // App
-    let mut app = App::new(device_names_str);
+    let mut app = Application::new(device_names_str);
 
     loop {
         terminal.draw(|f| {
