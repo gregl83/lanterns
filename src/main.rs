@@ -40,8 +40,7 @@ use crate::util::{
     event::{
         Event,
         Events
-    },
-    StatefulList,
+    }
 };
 
 use blurz::BluetoothDevice;
