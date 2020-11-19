@@ -3,44 +3,33 @@ mod util;
 mod io;
 mod gui;
 
-use std::error::Error;
-
-use termion::{
-    event::Key,
-    input::MouseTerminal,
-    raw::IntoRawMode,
-    screen::AlternateScreen
+use std::{
+    error::Error,
+    io::{
+        stdout,
+        Write
+    },
 };
+
+use crossterm::{
+    event::{
+        EnableMouseCapture,
+    },
+    execute,
+    terminal::{
+        enable_raw_mode,
+        EnterAlternateScreen,
+    },
+};
+
 use tui::{
-    backend::TermionBackend,
-    layout::{
-        Constraint,
-        Direction,
-        Layout,
-    },
-    style::{
-        Color,
-        Modifier,
-        Style,
-    },
-    text::{
-        Spans,
-    },
-    widgets::{
-        Block,
-        Borders,
-        List,
-        ListItem,
-    },
+    backend::CrosstermBackend,
     Terminal,
 };
 
-use crate::gui::Application;
-use crate::util::{
-    event::{
-        Event,
-        Events
-    }
+use crate::gui::{
+    Application,
+    draw,
 };
 
 use blurz::BluetoothDevice;
@@ -51,6 +40,7 @@ use crate::io::adapters::{
     create_bluetooth_discovery_session,
     get_bluetooth_device_paths,
 };
+use crate::util::event::Events;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let session = create_bluetooth_session().unwrap();
@@ -69,63 +59,29 @@ fn main() -> Result<(), Box<dyn Error>> {
         device_name.as_str()
     }).collect();
 
-    // Terminal initialization
-    let stdout = std::io::stdout().into_raw_mode()?;
-    let stdout = MouseTerminal::from(stdout);
-    let stdout = AlternateScreen::from(stdout);
-    let backend = TermionBackend::new(stdout);
+    // starting tui-rs + crossterm ---
+
+    enable_raw_mode()?;
+
+    let mut stdout = stdout();
+    execute!(stdout, EnterAlternateScreen, EnableMouseCapture)?;
+
+    let backend = CrosstermBackend::new(stdout);
+
     let mut terminal = Terminal::new(backend)?;
 
-    let events = Events::new();
+    // fixme: bind events to application handling
 
-    // App
+    let _events = Events::new();
+
     let mut app = Application::new(device_names_str);
 
+    terminal.clear()?;
+
     loop {
-        terminal.draw(|f| {
-            let chunks = Layout::default()
-                .direction(Direction::Horizontal)
-                .constraints([Constraint::Percentage(50), Constraint::Percentage(50)].as_ref())
-                .split(f.size());
-
-            let items: Vec<ListItem> = app
-                .devices
-                .items
-                .iter()
-                .map(|i: &&str| {
-                    ListItem::new(vec![Spans::from(*i)]).style(Style::default())
-                })
-                .collect();
-            let items = List::new(items)
-                .block(Block::default().borders(Borders::ALL).title("Devices"))
-                .highlight_style(
-                    Style::default()
-                        .bg(Color::LightGreen)
-                        .add_modifier(Modifier::BOLD),
-                )
-                .highlight_symbol(">> ");
-            f.render_stateful_widget(items, chunks[0], &mut app.devices.state);
-        })?;
-
-        match events.next()? {
-            Event::Input(input) => match input {
-                Key::Char('q') => {
-                    break;
-                }
-                Key::Left => {
-                    app.devices.unselect();
-                }
-                Key::Down => {
-                    app.devices.next();
-                }
-                Key::Up => {
-                    app.devices.previous();
-                }
-                _ => {}
-            },
-            Event::Tick => {
-                app.advance();
-            }
+        terminal.draw(|f| draw(f, &mut app))?;
+        if app.should_quit {
+            break;
         }
     }
 
