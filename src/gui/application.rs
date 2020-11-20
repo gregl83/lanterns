@@ -37,4 +37,10 @@ impl<'a> Application<'a> {
             _ => {}
         }
     }
+
+    pub fn on_return(&mut self) {
+        let device = self.devices.current();
+
+        // todo - set device
+    }
 }
