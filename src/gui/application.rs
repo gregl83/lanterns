@@ -13,6 +13,16 @@ impl<'a> Application<'a> {
         }
     }
 
+    pub fn on_tick(&mut self) { }
+
+    pub fn on_up(&mut self) { }
+
+    pub fn on_right(&mut self) { }
+
+    pub fn on_down(&mut self) { }
+
+    pub fn on_left(&mut self) { }
+
     pub fn on_key(&mut self, c: char) {
         match c {
             'q' => {

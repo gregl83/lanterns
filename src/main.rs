@@ -14,11 +14,15 @@ use std::{
 use crossterm::{
     event::{
         EnableMouseCapture,
+        DisableMouseCapture,
+        KeyCode,
     },
     execute,
     terminal::{
         enable_raw_mode,
+        disable_raw_mode,
         EnterAlternateScreen,
+        LeaveAlternateScreen,
     },
 };
 
@@ -40,7 +44,10 @@ use crate::io::adapters::{
     create_bluetooth_discovery_session,
     get_bluetooth_device_paths,
 };
-use crate::util::event::Events;
+use crate::util::event::{
+    Events,
+    Event,
+};
 
 fn main() -> Result<(), Box<dyn Error>> {
     let session = create_bluetooth_session().unwrap();
@@ -70,9 +77,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let mut terminal = Terminal::new(backend)?;
 
-    // fixme: bind events to application handling
-
-    let _events = Events::new();
+    let events = Events::new();
 
     let mut app = Application::new(device_names_str);
 
@@ -80,6 +85,29 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     loop {
         terminal.draw(|f| draw(f, &mut app))?;
+        match events.next()? {
+            Event::Input(event) => match event.code {
+                KeyCode::Char('q') => {
+                    disable_raw_mode()?;
+                    execute!(
+                        terminal.backend_mut(),
+                        LeaveAlternateScreen,
+                        DisableMouseCapture
+                    )?;
+                    terminal.show_cursor()?;
+                    break;
+                }
+                KeyCode::Char(c) => app.on_key(c),
+                KeyCode::Left => app.on_left(),
+                KeyCode::Up => app.on_up(),
+                KeyCode::Right => app.on_right(),
+                KeyCode::Down => app.on_down(),
+                _ => {}
+            },
+            Event::Tick => {
+                app.on_tick();
+            }
+        }
         if app.should_quit {
             break;
         }
