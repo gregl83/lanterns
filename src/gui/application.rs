@@ -1,12 +1,13 @@
 use crate::util::StatefulList;
+use blurz::BluetoothDevice;
 
 pub struct Application<'a> {
-    pub devices: StatefulList<&'a str>,
+    pub devices: StatefulList<BluetoothDevice<'a>>,
     pub should_quit: bool,
 }
 
 impl<'a> Application<'a> {
-    pub fn new(devices: Vec<&'a str>) -> Application<'a> {
+    pub fn new(devices: Vec<BluetoothDevice<'a>>) -> Application<'a> {
         Application {
             devices: StatefulList::with_items(devices),
             should_quit: false,
@@ -39,7 +40,7 @@ impl<'a> Application<'a> {
     }
 
     pub fn on_return(&mut self) {
-        let device = self.devices.current();
+        let _device = self.devices.current().unwrap();
 
         // todo - set device
     }

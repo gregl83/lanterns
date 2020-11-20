@@ -12,6 +12,7 @@ use tui::{
     },
     Frame,
 };
+use blurz::BluetoothDevice;
 
 pub fn draw<B: Backend>(f: &mut Frame<B>, app: &mut Application) {
     let chunks = Layout::default()
@@ -23,8 +24,9 @@ pub fn draw<B: Backend>(f: &mut Frame<B>, app: &mut Application) {
         .devices
         .items
         .iter()
-        .map(|i: &&str| {
-            ListItem::new(vec![Spans::from(*i)]).style(Style::default())
+        .map(|device: &BluetoothDevice| {
+            let device_name = device.get_name().unwrap();
+            ListItem::new(vec![Spans::from(device_name)]).style(Style::default())
         })
         .collect();
     let items = List::new(items)

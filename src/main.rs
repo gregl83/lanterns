@@ -36,35 +36,21 @@ use crate::gui::{
     draw,
 };
 
-use blurz::BluetoothDevice;
-
-use crate::io::adapters::{
-    create_bluetooth_session,
-    create_bluetooth_adapter,
-    create_bluetooth_discovery_session,
-    get_bluetooth_device_paths,
-};
+use crate::io::adapters::bluetooth;
 use crate::util::event::{
     Events,
     Event,
 };
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let session = create_bluetooth_session().unwrap();
-    let adapter = create_bluetooth_adapter(&session).unwrap();
-    let disc_session = create_bluetooth_discovery_session(&session, &adapter).unwrap();
+    let session = bluetooth::create_session().unwrap();
+    let adapter = bluetooth::create_adapter(&session).unwrap();
+    let disc_session = bluetooth::create_discovery_session(&session, &adapter).unwrap();
 
     println!("Searching for bluetooth devices...");
 
-    let device_paths = get_bluetooth_device_paths(&adapter, &disc_session).unwrap();
-    let device_names: Vec<String> = device_paths.iter().map(|device_path| {
-        let device = BluetoothDevice::new(&session, device_path.clone());
-        let device_name = device.get_name().unwrap();
-        device_name.clone()
-    }).collect();
-    let device_names_str: Vec<&str> = device_names.iter().map(|device_name| {
-        device_name.as_str()
-    }).collect();
+    let device_paths = bluetooth::get_device_paths(&adapter, &disc_session).unwrap();
+    let devices = bluetooth::get_devices(&session, device_paths).unwrap();
 
     // starting tui-rs + crossterm ---
 
@@ -79,7 +65,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let events = Events::new();
 
-    let mut app = Application::new(device_names_str);
+    let mut app = Application::new(devices);
 
     terminal.clear()?;
 

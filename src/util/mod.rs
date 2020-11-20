@@ -96,7 +96,7 @@ impl<T> StatefulList<T> {
         }
     }
 
-    pub fn current(&mut self) -> Option<T> {
+    pub fn current(&mut self) -> Option<&T> {
         match self.state.selected() {
             Some(i) => {
                 self.items.get(i)
