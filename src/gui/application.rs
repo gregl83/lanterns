@@ -1,15 +1,15 @@
 use crate::util::StatefulList;
-use blurz::BluetoothDevice;
+use crate::io::adapters::Connectable;
 
 pub struct Application<'a> {
-    pub devices: StatefulList<BluetoothDevice<'a>>,
+    pub devices: StatefulList<'a, Box<dyn Connectable>>,
     pub should_quit: bool,
 }
 
 impl<'a> Application<'a> {
-    pub fn new(devices: Vec<BluetoothDevice<'a>>) -> Application<'a> {
+    pub fn new(devices: &Vec<Box<dyn Connectable>>) -> Self {
         Application {
-            devices: StatefulList::with_items(devices),
+            devices: StatefulList::new(devices),
             should_quit: false,
         }
     }

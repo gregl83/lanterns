@@ -12,7 +12,8 @@ use tui::{
     },
     Frame,
 };
-use blurz::BluetoothDevice;
+
+use crate::io::adapters::Connectable;
 
 pub fn draw<B: Backend>(f: &mut Frame<B>, app: &mut Application) {
     let chunks = Layout::default()
@@ -24,8 +25,8 @@ pub fn draw<B: Backend>(f: &mut Frame<B>, app: &mut Application) {
         .devices
         .items
         .iter()
-        .map(|device: &BluetoothDevice| {
-            let device_name = device.get_name().unwrap();
+        .map(|device: &dyn Connectable| {
+            let device_name = device.get_name();
             ListItem::new(vec![Spans::from(device_name)]).style(Style::default())
         })
         .collect();

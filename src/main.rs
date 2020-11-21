@@ -36,21 +36,20 @@ use crate::gui::{
     draw,
 };
 
-use crate::io::adapters::bluetooth;
+use crate::io::adapters::{bluetooth, Discoverable};
 use crate::util::event::{
     Events,
     Event,
 };
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let session = bluetooth::create_session().unwrap();
-    let adapter = bluetooth::create_adapter(&session).unwrap();
-    let disc_session = bluetooth::create_discovery_session(&session, &adapter).unwrap();
+    let mut adapter = bluetooth::Adapter::new();
 
     println!("Searching for bluetooth devices...");
 
-    let device_paths = bluetooth::get_device_paths(&adapter, &disc_session).unwrap();
-    let devices = bluetooth::get_devices(&session, device_paths).unwrap();
+    adapter.discover_devices();
+
+    let devices = adapter.borrow_devices();
 
     // starting tui-rs + crossterm ---
 
