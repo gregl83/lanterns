@@ -2,10 +2,10 @@ pub mod bluetooth;
 
 use std::error::Error;
 
-pub trait Discoverable {
-    fn discover_devices(&mut self) -> Result<(), Box<dyn Error>>;
+pub trait Discoverable<'a> {
+    fn discover_devices(&'a mut self) -> Result<(), Box<dyn Error>>;
 
-    fn borrow_devices(&self) -> &Vec<Box<dyn Connectable>>;
+    fn borrow_devices(&'a self) -> &Vec<Box<dyn Connectable>>;
 }
 
 pub trait Connectable {

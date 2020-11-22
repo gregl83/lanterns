@@ -7,7 +7,7 @@ pub struct Application<'a> {
 }
 
 impl<'a> Application<'a> {
-    pub fn new(devices: &Vec<Box<dyn Connectable>>) -> Self {
+    pub fn new(devices: &'a Vec<Box<dyn Connectable>>) -> Self {
         Application {
             devices: StatefulList::new(devices),
             should_quit: false,

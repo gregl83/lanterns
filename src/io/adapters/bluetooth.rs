@@ -1,6 +1,7 @@
-use std::error::{Error};
-use std::time::Duration;
+use std::error::Error;
+use std::rc::Rc;
 use std::thread;
+use std::time::Duration;
 
 use blurz::{BluetoothAdapter, BluetoothSession, BluetoothDiscoverySession, BluetoothDevice};
 
@@ -40,28 +41,39 @@ pub fn get_device_paths(
 }
 
 pub struct Adapter<'a> {
-    session: BluetoothSession,
-    adapter: BluetoothAdapter<'a>,
-    discovery_session: BluetoothDiscoverySession<'a>,
+    session: Rc<BluetoothSession>,
+    adapter: Rc<BluetoothAdapter<'a>>,
+    discovery_session: Rc<BluetoothDiscoverySession<'a>>,
     devices: Vec<Box<dyn Connectable>>,
 }
 
 impl<'a> Adapter<'a> {
     pub fn new() -> Self {
-        let session = create_session().unwrap();
-        let adapter = create_adapter(&session).unwrap();
-        let discovery_session = create_discovery_session(&session, &adapter).unwrap();
+        let adapter = Adapter {
+            session: Rc::new(),
+        };
+
+        let session = Rc::new(
+            create_session().unwrap()
+        );
+        let adapter = Rc::new(
+            create_adapter(&session).unwrap()
+        );
+        let discovery_session = Rc::new(
+            create_discovery_session(&session, &Rc::clone(&adapter)).unwrap()
+        );
+
         Adapter {
-            session,
-            adapter,
-            discovery_session,
+            session: Rc::to_owned(&session),
+            adapter: Rc::to_owned(&adapter),
+            discovery_session: Rc::to_owned(&discovery_session),
             devices: Vec::new()
         }
     }
 }
 
-impl<'a> Discoverable for Adapter<'a> {
-    fn discover_devices(&mut self) -> Result<(), Box<dyn Error>> {
+impl<'a> Discoverable<'a> for Adapter<'a> {
+    fn discover_devices(&'a mut self) -> Result<(), Box<dyn Error>> {
         let device_paths = get_device_paths(&self.adapter, &self.discovery_session).unwrap();
 
         self.devices.clear();
@@ -70,7 +82,10 @@ impl<'a> Discoverable for Adapter<'a> {
             self.devices.push(
                 Box::new(
                     Device {
-                        device: BluetoothDevice::new(&self.session, device_path.clone())
+                        device: BluetoothDevice::new(
+                            &Rc::clone(&self.session),
+                            device_path.clone()
+                        )
                     }
                 )
             );
@@ -79,7 +94,7 @@ impl<'a> Discoverable for Adapter<'a> {
         Ok(())
     }
 
-    fn borrow_devices(&self) -> &Vec<Box<dyn Connectable>> {
+    fn borrow_devices(&'a self) -> &Vec<Box<dyn Connectable>> {
         &self.devices
     }
 }

@@ -13,8 +13,6 @@ use tui::{
     Frame,
 };
 
-use crate::io::adapters::Connectable;
-
 pub fn draw<B: Backend>(f: &mut Frame<B>, app: &mut Application) {
     let chunks = Layout::default()
         .direction(Direction::Horizontal)
@@ -25,7 +23,7 @@ pub fn draw<B: Backend>(f: &mut Frame<B>, app: &mut Application) {
         .devices
         .items
         .iter()
-        .map(|device: &dyn Connectable| {
+        .map(|device| {
             let device_name = device.get_name();
             ListItem::new(vec![Spans::from(device_name)]).style(Style::default())
         })
