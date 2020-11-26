@@ -9,23 +9,24 @@ use crate::io::adapters::{
     Discoverable,
     Connectable,
 };
+use std::borrow::Borrow;
 
 fn create_session() -> Result<BluetoothSession, Box<dyn Error>> {
     Ok(BluetoothSession::create_session(None)?)
 }
 
-fn create_adapter(session: &BluetoothSession) -> Result<BluetoothAdapter, Box<dyn Error>> {
-    let adapter = BluetoothAdapter::init(session)?;
+fn create_adapter<'a>(session: Rc<BluetoothSession>) -> Result<BluetoothAdapter<'a>, Box<dyn Error>> {
+    let adapter = BluetoothAdapter::init(&session)?;
     adapter.set_powered(true)?;
     Ok(adapter)
 }
 
 fn create_discovery_session<'a>(
-    session: &'a BluetoothSession,
-    adapter: &'a BluetoothAdapter
+    session: Rc<BluetoothSession>,
+    adapter: Rc<BluetoothAdapter>
 ) -> Result<BluetoothDiscoverySession<'a>, Box<dyn Error>> {
     Ok(BluetoothDiscoverySession::create_session(
-        session,
+        &session,
         adapter.get_id()
     )?)
 }
@@ -49,24 +50,22 @@ pub struct Adapter<'a> {
 
 impl<'a> Adapter<'a> {
     pub fn new() -> Self {
-        let adapter = Adapter {
-            session: Rc::new(),
-        };
-
         let session = Rc::new(
             create_session().unwrap()
         );
+
         let adapter = Rc::new(
-            create_adapter(&session).unwrap()
+            create_adapter(session.clone()).unwrap()
         );
+
         let discovery_session = Rc::new(
-            create_discovery_session(&session, &Rc::clone(&adapter)).unwrap()
+            create_discovery_session(session.clone(), adapter.clone()).unwrap()
         );
 
         Adapter {
-            session: Rc::to_owned(&session),
-            adapter: Rc::to_owned(&adapter),
-            discovery_session: Rc::to_owned(&discovery_session),
+            session,
+            adapter,
+            discovery_session,
             devices: Vec::new()
         }
     }
