@@ -2,6 +2,8 @@
 
 Private Communications No Holds Barred
 
+An experimentation of encryption, comms, and hardware. This project serves as a testbed for securing the transmission of data.
+
 ## Stability
 
 Experimental
