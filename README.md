@@ -10,7 +10,7 @@ Experimental
 
 ## Branching Strategy
 
-[https://trunkbaseddevelopment.com/](Trunk Based Development)
+[Trunk Based Development](https://trunkbaseddevelopment.com/)
 
 ## Architecture
 
