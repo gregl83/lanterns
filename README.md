@@ -27,9 +27,27 @@ In the dawn of mobile communications, distributed systems and IoT, privacy has b
   - Implementation Cost
   - Multilayered Cost vs Benefit
  - Encryption Candidates
-   - Rivest–Shamir–Adleman (RSA)
-   - Elliptic-curve Diffie–Hellman (ECDH)
-   - Rijndael - Advanced Encryption Standard (AES)
+   - Key Exchange
+     - Rivest–Shamir–Adleman (RSA)
+     - Elliptic-curve Diffie–Hellman (ECDH)
+   - Message Exchange
+     - Rijndael - Advanced Encryption Standard (AES)
+- Data Transmission
+  - Bluetooth
+    - Range Reduction
+    - Server-side attack vector (client target)
+  - Multi-wire planar cable (Ribbon Cable)
+    - Raspberry Pi Two-wire GPIO
+    - Custom Driver
+  - Faraday Shield
+- Hardware
+  - Custom printed circuit board (PCB)
+  - Raspberry Pi Zero sans WiFi
+  - Mobile device w/Termux 
+  - Laptop
+  - Device Shield
+    - Electromagnetic (Farady)
+    - Acoustic
 
 ## Development
 
