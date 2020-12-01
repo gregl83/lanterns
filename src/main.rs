@@ -43,13 +43,11 @@ use crate::util::event::{
 };
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let mut adapter = bluetooth::Adapter::new();
+    let adapter = bluetooth::Adapter::new();
 
     println!("Searching for bluetooth devices...");
 
-    adapter.discover_devices();
-
-    let devices = adapter.borrow_devices();
+    let devices = adapter.discover_devices().unwrap();
 
     // starting tui-rs + crossterm ---
 

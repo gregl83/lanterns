@@ -9,27 +9,6 @@ use crate::io::adapters::{
     Discoverable,
     Connectable,
 };
-use std::borrow::Borrow;
-
-fn create_session() -> Result<BluetoothSession, Box<dyn Error>> {
-    Ok(BluetoothSession::create_session(None)?)
-}
-
-fn create_adapter<'a>(session: Rc<BluetoothSession>) -> Result<BluetoothAdapter<'a>, Box<dyn Error>> {
-    let adapter = BluetoothAdapter::init(&session)?;
-    adapter.set_powered(true)?;
-    Ok(adapter)
-}
-
-fn create_discovery_session<'a>(
-    session: Rc<BluetoothSession>,
-    adapter: Rc<BluetoothAdapter>
-) -> Result<BluetoothDiscoverySession<'a>, Box<dyn Error>> {
-    Ok(BluetoothDiscoverySession::create_session(
-        &session,
-        adapter.get_id()
-    )?)
-}
 
 pub fn get_device_paths(
     adapter: &BluetoothAdapter,
@@ -41,73 +20,71 @@ pub fn get_device_paths(
     Ok(adapter.get_device_list()?)
 }
 
-pub struct Adapter<'a> {
-    session: Rc<BluetoothSession>,
-    adapter: Rc<BluetoothAdapter<'a>>,
-    discovery_session: Rc<BluetoothDiscoverySession<'a>>,
-    devices: Vec<Box<dyn Connectable>>,
+pub struct Adapter {
+    session: BluetoothSession
 }
 
-impl<'a> Adapter<'a> {
+impl Adapter {
     pub fn new() -> Self {
-        let session = Rc::new(
-            create_session().unwrap()
-        );
-
-        let adapter = Rc::new(
-            create_adapter(session.clone()).unwrap()
-        );
-
-        let discovery_session = Rc::new(
-            create_discovery_session(session.clone(), adapter.clone()).unwrap()
-        );
-
         Adapter {
-            session,
-            adapter,
-            discovery_session,
-            devices: Vec::new()
+            session: BluetoothSession::create_session(None).unwrap()
         }
+    }
+
+    fn get_adapter(&self) -> BluetoothAdapter {
+        BluetoothAdapter::init(&self.session).unwrap()
+    }
+
+    fn get_discovery_session(&self, adapter_id: String) -> BluetoothDiscoverySession {
+        BluetoothDiscoverySession::create_session(
+            &self.session,
+            adapter_id
+        ).unwrap()
     }
 }
 
-impl<'a> Discoverable<'a> for Adapter<'a> {
-    fn discover_devices(&'a mut self) -> Result<(), Box<dyn Error>> {
-        let device_paths = get_device_paths(&self.adapter, &self.discovery_session).unwrap();
+impl Discoverable for Adapter {
+    fn discover_devices(&self) -> Result<Vec<Device>, Box<dyn Error>> {
+        let adapter = self.get_adapter();
+        let adapter_id = adapter.get_id();
+        let discovery_session = self.get_discovery_session(adapter_id);
 
-        self.devices.clear();
+        let device_paths = get_device_paths(
+            &adapter,
+            &discovery_session
+        ).unwrap();
+
+        let mut devices = Vec::new();
 
         for device_path in device_paths {
-            self.devices.push(
-                Box::new(
-                    Device {
-                        device: BluetoothDevice::new(
-                            &Rc::clone(&self.session),
-                            device_path.clone()
-                        )
-                    }
-                )
+            let device = BluetoothDevice::new(
+                &self.session,
+                device_path.clone()
             );
+
+            devices.push(Device {
+                id: device.get_id(),
+                address: device.get_address().unwrap(),
+                name: device.get_name().unwrap(),
+            });
         }
 
-        Ok(())
-    }
-
-    fn borrow_devices(&'a self) -> &Vec<Box<dyn Connectable>> {
-        &self.devices
+        Ok(devices)
     }
 }
 
-struct Device<'a> {
-    device: BluetoothDevice<'a>
+pub struct Device {
+    id: String,
+    address: String,
+    pub name: String,
 }
 
-impl<'a> Connectable for Device<'a> {
+impl Connectable for Device {
     fn connect(&self, _key: &str) -> Result<(), Box<dyn Error>> {
         Ok(())
     }
 
     fn get_name(&self) -> &str {
-        self.get_name()
+        self.name.as_str()
     }
 }

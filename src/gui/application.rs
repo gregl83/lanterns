@@ -1,13 +1,13 @@
 use crate::util::StatefulList;
-use crate::io::adapters::Connectable;
+use crate::io::adapters::bluetooth::Device;
 
-pub struct Application<'a> {
-    pub devices: StatefulList<'a, Box<dyn Connectable>>,
+pub struct Application {
+    pub devices: StatefulList<Device>,
     pub should_quit: bool,
 }
 
-impl<'a> Application<'a> {
-    pub fn new(devices: &'a Vec<Box<dyn Connectable>>) -> Self {
+impl Application {
+    pub fn new(devices: Vec<Device>) -> Self {
         Application {
             devices: StatefulList::new(devices),
             should_quit: false,

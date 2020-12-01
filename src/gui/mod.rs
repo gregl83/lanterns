@@ -24,8 +24,7 @@ pub fn draw<B: Backend>(f: &mut Frame<B>, app: &mut Application) {
         .items
         .iter()
         .map(|device| {
-            let device_name = device.get_name();
-            ListItem::new(vec![Spans::from(device_name)]).style(Style::default())
+            ListItem::new(vec![Spans::from(device.name.clone())]).style(Style::default())
         })
         .collect();
     let items = List::new(items)

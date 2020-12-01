@@ -76,13 +76,13 @@ impl<'a> TabsState<'a> {
     }
 }
 
-pub struct StatefulList<'a, T> {
+pub struct StatefulList<T> {
     pub state: ListState,
-    pub items: &'a Vec<T>,
+    pub items: Vec<T>,
 }
 
-impl<'a, T> StatefulList<'a, T> {
-    pub fn new(items: &Vec<T>) -> StatefulList<T> {
+impl<T> StatefulList<T> {
+    pub fn new(items: Vec<T>) -> StatefulList<T> {
         StatefulList {
             state: ListState::default(),
             items,
