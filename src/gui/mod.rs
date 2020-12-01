@@ -4,7 +4,7 @@ pub use application::Application;
 
 use tui::{
     backend::Backend,
-    layout::{Constraint, Direction, Layout},
+    layout::{Constraint, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
     text::{Spans},
     widgets::{
@@ -13,12 +13,7 @@ use tui::{
     Frame,
 };
 
-pub fn draw<B: Backend>(f: &mut Frame<B>, app: &mut Application) {
-    let chunks = Layout::default()
-        .direction(Direction::Horizontal)
-        .constraints([Constraint::Percentage(50), Constraint::Percentage(50)].as_ref())
-        .split(f.size());
-
+fn draw_bluetooth_device_selection<B: Backend>(f: &mut Frame<B>, app: &mut Application, chunk: Rect) {
     let items: Vec<ListItem> = app
         .devices
         .items
@@ -35,5 +30,44 @@ pub fn draw<B: Backend>(f: &mut Frame<B>, app: &mut Application) {
                 .add_modifier(Modifier::BOLD),
         )
         .highlight_symbol(">> ");
-    f.render_stateful_widget(items, chunks[0], &mut app.devices.state);
+    f.render_stateful_widget(items, chunk, &mut app.devices.state);
+}
+
+fn draw_message_input<B: Backend>(f: &mut Frame<B>, app: &mut Application, chunk: Rect) {
+    let items = List::new(Vec::new())
+        .block(Block::default().borders(Borders::ALL).title("Message"))
+        .highlight_style(
+            Style::default()
+                .bg(Color::LightGreen)
+                .add_modifier(Modifier::BOLD),
+        )
+        .highlight_symbol(">> ");
+    f.render_stateful_widget(items, chunk, &mut app.devices.state);
+}
+
+fn draw_info_bar<B: Backend>(f: &mut Frame<B>, app: &mut Application, chunk: Rect) {
+    let items = List::new(Vec::new())
+        .block(Block::default().borders(Borders::ALL).title("Info"))
+        .highlight_style(
+            Style::default()
+                .bg(Color::LightGreen)
+                .add_modifier(Modifier::BOLD),
+        )
+        .highlight_symbol(">> ");
+    f.render_stateful_widget(items, chunk, &mut app.devices.state);
+}
+
+pub fn draw<B: Backend>(f: &mut Frame<B>, app: &mut Application) {
+    let chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([
+            Constraint::Min(0),
+            Constraint::Length(3),
+            Constraint::Length(6),
+        ].as_ref())
+        .split(f.size());
+
+    draw_bluetooth_device_selection(f, app, chunks[0]);
+    draw_info_bar(f, app, chunks[1]);
+    draw_message_input(f, app, chunks[2]);
 }
