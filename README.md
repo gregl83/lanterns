@@ -12,6 +12,18 @@ Experimental
 
 [Trunk Based Development](https://trunkbaseddevelopment.com/)
 
+## Installation
+
+1. [Install Rust and Cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html)
+2. Git clone this repository
+3. From cloned repository, run:
+   `cargo install --path=.`
+4. That's it, `lanterns` should now be installed on your system!
+
+## Usage
+
+Run `lanterns`.
+
 ## Problem Statement
 
 In the dawn of mobile communications, distributed systems and IoT, privacy has become an afterthought. Under a guise of enormous complexity, from circuitry to software, governing bodies, both private and civic, have demanded unrestrained access to personal data without checks and balances.
@@ -83,4 +95,4 @@ In the dawn of mobile communications, distributed systems and IoT, privacy has b
 
 ## License
 
-MIT
+[MIT](LICENSE)
