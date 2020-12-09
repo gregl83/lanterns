@@ -17,7 +17,9 @@ Experimental
 1. [Install Rust and Cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html)
 2. Git clone this repository
 3. From cloned repository, run:
+
    `cargo install --path=.`
+
 4. That's it, `lanterns` should now be installed on your system!
 
 ## Usage
