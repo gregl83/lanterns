@@ -2,6 +2,7 @@
 mod util;
 mod io;
 mod gui;
+mod logger;
 
 use std::{
     error::Error,
@@ -10,6 +11,8 @@ use std::{
         Write
     },
 };
+
+use log::{LevelFilter};
 
 use crossterm::{
     event::{
@@ -31,6 +34,8 @@ use tui::{
     Terminal,
 };
 
+use crate::logger::Log;
+
 use crate::gui::{
     Application,
     draw,
@@ -42,7 +47,12 @@ use crate::util::event::{
     Event,
 };
 
+static LOGGER: Log = Log;
+
 fn main() -> Result<(), Box<dyn Error>> {
+    // todo - dynamic level filter (debug mode)
+    log::set_logger(&LOGGER).map(|()| log::set_max_level(LevelFilter::Debug)).unwrap();
+
     let adapter = bluetooth::Adapter::new();
 
     println!("Searching for bluetooth devices...");
