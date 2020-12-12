@@ -72,6 +72,10 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let events = Events::new();
 
+    // todo - screens
+    // todo - state management using Mutex
+    // todo - modules for each component
+
     let mut app = Application::new(devices);
 
     terminal.clear()?;
