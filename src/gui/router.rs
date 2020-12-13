@@ -1,9 +1,11 @@
 // todo - route to screens
 
-enum Routes {
-    Dashboard
+enum Route {
+    Dashboard,
+    Connection,
+    Communicate,
 }
 
-pub fn route() {
-
+pub fn route(route: Route) {
+    // todo load screen based on conditions
 }

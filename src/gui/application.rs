@@ -14,6 +14,12 @@ impl Application {
         }
     }
 
+    pub fn key_handler(&mut self) {
+        // todo - load screen based on conditions
+
+        // todo - handle default keys then pass to screen
+    }
+
     pub fn on_tick(&mut self) { }
 
     pub fn on_up(&mut self) {
