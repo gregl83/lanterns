@@ -1,32 +1,27 @@
-use crate::gui::Application;
+use std::slice::Iter;
 
 use tui::{
-    backend::Backend,
-    layout::{Rect},
     style::{Color, Modifier, Style},
     text::{Spans},
     widgets::{
         Block, Borders, List, ListItem
     },
-    Frame,
 };
 
-pub fn draw_bluetooth_device_selection<B: Backend>(f: &mut Frame<B>, app: &mut Application, chunk: Rect) {
-    let items: Vec<ListItem> = app
-        .devices
-        .items
-        .iter()
+use crate::io::adapters::bluetooth::Device;
+
+pub fn draw_bluetooth_device_selection(devices: Iter<'_, Device>) -> List<'static> {
+    let items: Vec<ListItem> = devices
         .map(|device| {
             ListItem::new(vec![Spans::from(device.name.clone())]).style(Style::default())
         })
         .collect();
-    let items = List::new(items)
+    List::new(items)
         .block(Block::default().borders(Borders::ALL).title("Devices"))
         .highlight_style(
             Style::default()
                 .bg(Color::LightGreen)
                 .add_modifier(Modifier::BOLD),
         )
-        .highlight_symbol(">> ");
-    f.render_stateful_widget(items, chunk, &mut app.devices.state);
+        .highlight_symbol(">> ")
 }

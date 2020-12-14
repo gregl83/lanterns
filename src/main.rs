@@ -35,12 +35,7 @@ use tui::{
 };
 
 use crate::logger::Log;
-
-use crate::gui::{
-    Application,
-    draw,
-};
-
+use crate::gui::application::Application;
 use crate::io::adapters::{bluetooth, Discoverable};
 use crate::util::event::{
     Events,
@@ -81,7 +76,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     terminal.clear()?;
 
     loop {
-        terminal.draw(|f| draw(f, &mut app))?;
+        terminal.draw(|f| app.draw(f))?;
         match events.next()? {
             Event::Input(event) => match event.code {
                 KeyCode::Char('q') => {
