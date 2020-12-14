@@ -1,6 +1,6 @@
 // todo - route to screens
 
-enum Route {
+pub enum Route {
     Dashboard,
     Connection,
     Communicate,

@@ -1,19 +1,23 @@
 use super::state::State;
 
-trait Screenable {
-    fn load() {
+pub trait Screenable {
+    fn draw(&mut self) {
         // todo - load screen based on conditions
+    }
+
+    fn on_key(&mut self) {
+        // todo - something when key is received
     }
 }
 
-struct Dashboard {}
+pub struct Dashboard {}
 
 impl Screenable for Dashboard {}
 
-struct Connection {}
+pub struct Connection {}
 
 impl Screenable for Connection {}
 
-struct Communicate {}
+pub struct Communicate {}
 
 impl Screenable for Communicate {}

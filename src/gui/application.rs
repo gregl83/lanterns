@@ -1,7 +1,10 @@
 use crate::util::StatefulList;
+use crate::gui::screens::Screenable;
+use crate::gui::screens::Dashboard;
 use crate::io::adapters::bluetooth::Device;
 
 pub struct Application {
+    screen: Box<dyn Screenable>,
     pub devices: StatefulList<Device>,
     pub should_quit: bool,
 }
@@ -9,6 +12,7 @@ pub struct Application {
 impl Application {
     pub fn new(devices: Vec<Device>) -> Self {
         Application {
+            screen: Box::new(Dashboard {}),
             devices: StatefulList::new(devices),
             should_quit: false,
         }
