@@ -17,7 +17,7 @@ use crate::io::adapters::bluetooth::Device;
 pub trait Screenable {
     fn draw(&mut self, state: &mut StatefulList<Device>, f: &mut Frame<CrosstermBackend<Stdout>>);
 
-    fn on_key(&mut self) { }
+    fn on_key(&mut self, c: char) { }
 }
 
 pub struct Dashboard {}

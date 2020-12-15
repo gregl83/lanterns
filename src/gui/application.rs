@@ -36,12 +36,6 @@ impl Application {
         screen.draw(&mut self.devices, f);
     }
 
-    pub fn key_handler(&mut self) {
-        // todo - load screen based on conditions
-
-        // todo - handle default keys then pass to screen
-    }
-
     pub fn on_tick(&mut self) { }
 
     pub fn on_up(&mut self) {
@@ -63,7 +57,10 @@ impl Application {
             'q' => {
                 self.should_quit = true;
             }
-            _ => {}
+            _ => {
+                let screen: &mut dyn Screenable = self.screens[self.screen_index].borrow_mut();
+                screen.on_key(c);
+            }
         }
     }
 
