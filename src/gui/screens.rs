@@ -7,7 +7,6 @@ use tui::{
     Frame,
 };
 
-use super::state::State;
 use crate::gui::application::Application;
 use super::modules::connection::draw_bluetooth_device_selection;
 use super::modules::message::draw_message_input;

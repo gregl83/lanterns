@@ -1,10 +1,10 @@
-pub struct State {
-    connected: bool
+pub struct Store {
+    connected: bool,
 }
 
-impl State {
+impl Store {
     pub fn new() -> Self {
-        State {
+        Store {
             connected: false,
         }
     }

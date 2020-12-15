@@ -36,6 +36,7 @@ use tui::{
 
 use crate::logger::Log;
 use crate::gui::application::Application;
+use crate::gui::store::Store;
 use crate::gui::screens::{
     Screenable,
     Dashboard,
@@ -74,13 +75,13 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut terminal = Terminal::new(backend)?;
 
     let events = Events::new();
-
+    let store = Store::new();
     let screens: Vec<Box<dyn Screenable>> = vec![
         Box::new(Dashboard {}),
         Box::new(Connection {}),
     ];
 
-    let mut app = Application::new(screens, devices);
+    let mut app = Application::new(store, screens, devices);
 
     // todo - state management using Mutex
 

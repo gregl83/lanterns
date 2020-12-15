@@ -1,18 +1,19 @@
+use std::io::Stdout;
+use std::borrow::BorrowMut;
+
 use tui::{
-    backend::Backend,
+    backend::CrosstermBackend,
     layout::{Constraint, Direction, Layout},
     Frame,
 };
 
-use crate::util::StatefulList;
+use crate::gui::store::Store;
 use crate::gui::screens::Screenable;
-use crate::gui::screens::Dashboard;
 use crate::io::adapters::bluetooth::Device;
-use tui::backend::CrosstermBackend;
-use std::io::Stdout;
-use std::borrow::{Borrow, BorrowMut};
+use crate::util::StatefulList;
 
 pub struct Application {
+    store: Store,
     screens: Vec<Box<dyn Screenable>>,
     screen_index: usize,
     pub devices: StatefulList<Device>,
@@ -20,8 +21,9 @@ pub struct Application {
 }
 
 impl Application {
-    pub fn new(screens: Vec<Box<dyn Screenable>>, devices: Vec<Device>) -> Self {
+    pub fn new(store: Store, screens: Vec<Box<dyn Screenable>>, devices: Vec<Device>) -> Self {
         Application {
+            store,
             screens,
             screen_index: 0,
             devices: StatefulList::new(devices),
@@ -31,7 +33,7 @@ impl Application {
 
     pub fn draw(&mut self, f: &mut Frame<CrosstermBackend<Stdout>>) {
         let screen: &mut dyn Screenable = self.screens[self.screen_index].borrow_mut();
-        screen.draw(self.devices.borrow_mut(), f);
+        screen.draw(&mut self.devices, f);
     }
 
     pub fn key_handler(&mut self) {
