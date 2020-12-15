@@ -72,6 +72,7 @@ impl Discoverable for Adapter {
     }
 }
 
+#[derive(Debug)]
 pub struct Device {
     id: String,
     address: String,

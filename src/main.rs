@@ -36,7 +36,15 @@ use tui::{
 
 use crate::logger::Log;
 use crate::gui::application::Application;
-use crate::io::adapters::{bluetooth, Discoverable};
+use crate::gui::screens::{
+    Screenable,
+    Dashboard,
+    Connection
+};
+use crate::io::adapters::{
+    Discoverable,
+    bluetooth
+};
 use crate::util::event::{
     Events,
     Event,
@@ -67,11 +75,14 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let events = Events::new();
 
-    // todo - screens
-    // todo - state management using Mutex
-    // todo - modules for each component
+    let screens: Vec<Box<dyn Screenable>> = vec![
+        Box::new(Dashboard {}),
+        Box::new(Connection {}),
+    ];
 
-    let mut app = Application::new(devices);
+    let mut app = Application::new(screens, devices);
+
+    // todo - state management using Mutex
 
     terminal.clear()?;
 
