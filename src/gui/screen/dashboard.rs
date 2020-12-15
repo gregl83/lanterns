@@ -7,20 +7,25 @@ use tui::{
     Frame,
 };
 
-use crate::gui::application::Application;
-use super::modules::connection::draw_bluetooth_device_selection;
-use super::modules::message::draw_message_input;
-use super::modules::info::draw_info_bar;
+use crate::gui::store::Store;
 use crate::util::StatefulList;
+use crate::gui::screen::Screenable;
+use crate::gui::modules::connection::draw_bluetooth_device_selection;
+use crate::gui::modules::message::draw_message_input;
+use crate::gui::modules::info::draw_info_bar;
 use crate::io::adapters::bluetooth::Device;
 
-pub trait Screenable {
-    fn draw(&mut self, state: &mut StatefulList<Device>, f: &mut Frame<CrosstermBackend<Stdout>>);
-
-    fn on_key(&mut self, c: char) { }
+pub struct Dashboard {
+    store: Store
 }
 
-pub struct Dashboard {}
+impl Dashboard {
+    pub fn new(store: Store) -> Self {
+        Dashboard {
+            store,
+        }
+    }
+}
 
 impl Screenable for Dashboard {
     fn draw(&mut self, state: &mut StatefulList<Device>, f: &mut Frame<CrosstermBackend<Stdout>>) {
@@ -49,16 +54,4 @@ impl Screenable for Dashboard {
             &mut state.state
         );
     }
-}
-
-pub struct Connection {}
-
-impl Screenable for Connection {
-    fn draw(&mut self, state: &mut StatefulList<Device>, f: &mut Frame<CrosstermBackend<Stdout>>) {}
-}
-
-pub struct Communicate {}
-
-impl Screenable for Communicate {
-    fn draw(&mut self, state: &mut StatefulList<Device>, f: &mut Frame<CrosstermBackend<Stdout>>) {}
 }

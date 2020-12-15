@@ -8,7 +8,7 @@ use tui::{
 };
 
 use crate::gui::store::Store;
-use crate::gui::screens::Screenable;
+use crate::gui::screen::Screenable;
 use crate::io::adapters::bluetooth::Device;
 use crate::util::StatefulList;
 

@@ -1,5 +1,5 @@
 pub mod application;
-pub mod screens;
+pub mod screen;
 pub mod store;
 mod modules;
 mod router;

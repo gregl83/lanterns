@@ -37,10 +37,11 @@ use tui::{
 use crate::logger::Log;
 use crate::gui::application::Application;
 use crate::gui::store::Store;
-use crate::gui::screens::{
+use crate::gui::screen::{
     Screenable,
-    Dashboard,
-    Connection
+    dashboard::Dashboard,
+    connection::Connection,
+    communicate::Communicate,
 };
 use crate::io::adapters::{
     Discoverable,
@@ -76,9 +77,12 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let events = Events::new();
     let store = Store::new();
+
+    // fixme - rc / mutex store sharing
     let screens: Vec<Box<dyn Screenable>> = vec![
-        Box::new(Dashboard {}),
-        Box::new(Connection {}),
+        Box::new(Dashboard::new(store)),
+        Box::new(Connection::new(store)),
+        Box::new(Communicate::new(store)),
     ];
 
     let mut app = Application::new(store, screens, devices);
