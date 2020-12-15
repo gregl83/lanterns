@@ -61,11 +61,14 @@ impl Discoverable for Adapter {
                 device_path.clone()
             );
 
-            devices.push(Device {
-                id: device.get_id(),
-                address: device.get_address().unwrap(),
-                name: device.get_name().unwrap(),
-            });
+            // todo - warning for unnamed devices
+            if let Ok(name) = device.get_name() {
+                devices.push(Device {
+                    id: device.get_id(),
+                    address: device.get_address().unwrap(),
+                    name
+                });
+            }
         }
 
         Ok(devices)
