@@ -75,8 +75,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     let events = Events::new();
     let store = Rc::new(RefCell::new(Store::new()));
     let screens: Vec<Box<dyn Screenable>> = vec![
-        Box::new(Dashboard::new(Rc::clone(&store), devices)),
-        Box::new(Connection::new(Rc::clone(&store))),
+        Box::new(Dashboard::new(Rc::clone(&store))),
+        Box::new(Connection::new(Rc::clone(&store), devices)),
         Box::new(Communicate::new(Rc::clone(&store))),
     ];
     let mut app = Application::new(Rc::clone(&store), screens);
