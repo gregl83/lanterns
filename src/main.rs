@@ -97,13 +97,9 @@ fn main() -> Result<(), Box<dyn Error>> {
                     terminal.show_cursor()?;
                     break;
                 }
-                KeyCode::Char(c) => app.on_key(c),
-                KeyCode::Left => app.on_left(),
-                KeyCode::Up => app.on_up(),
-                KeyCode::Right => app.on_right(),
-                KeyCode::Down => app.on_down(),
-                KeyCode::Enter => app.on_return(),
-                _ => {}
+                e => {
+                    app.on_key(e);
+                }
             },
             Event::Tick => {
                 app.on_tick();

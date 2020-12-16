@@ -10,6 +10,7 @@ use tui::{
     widgets::ListState,
     Frame,
 };
+use crossterm::event::KeyCode;
 
 use crate::gui::store::Store;
 use crate::util::StatefulList;
@@ -59,5 +60,17 @@ impl Screenable for Dashboard {
             chunks[2],
             &mut self.devices.state
         );
+    }
+
+    fn on_key(&mut self, key_code: KeyCode) {
+        match key_code {
+            KeyCode::Left => self.devices.unselect(),
+            KeyCode::Up => self.devices.previous(),
+            KeyCode::Down => self.devices.next(),
+            KeyCode::Enter => {
+                let _device = self.devices.current().unwrap();
+            },
+            _ => {}
+        }
     }
 }
