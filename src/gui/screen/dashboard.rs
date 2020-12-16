@@ -1,4 +1,8 @@
-use std::io::Stdout;
+use std::{
+    io::Stdout,
+    rc::Rc,
+    cell::RefCell
+};
 
 use tui::{
     backend::CrosstermBackend,
@@ -16,11 +20,11 @@ use crate::gui::modules::info::draw_info_bar;
 use crate::io::adapters::bluetooth::Device;
 
 pub struct Dashboard {
-    store: Store
+    store: Rc<RefCell<Store>>
 }
 
 impl Dashboard {
-    pub fn new(store: Store) -> Self {
+    pub fn new(store: Rc<RefCell<Store>>) -> Self {
         Dashboard {
             store,
         }

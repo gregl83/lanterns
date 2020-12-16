@@ -1,4 +1,8 @@
-use std::io::Stdout;
+use std::{
+    io::Stdout,
+    rc::Rc,
+    cell::RefCell
+};
 
 use tui::{
     backend::CrosstermBackend,
@@ -13,11 +17,11 @@ use crate::gui::screen::Screenable;
 use crate::io::adapters::bluetooth::Device;
 
 pub struct Communicate {
-    store: Store
+    store: Rc<RefCell<Store>>
 }
 
 impl Communicate {
-    pub fn new(store: Store) -> Self {
+    pub fn new(store: Rc<RefCell<Store>>) -> Self {
         Communicate {
             store,
         }

@@ -1,5 +1,9 @@
-use std::io::Stdout;
-use std::borrow::BorrowMut;
+use std::{
+    io::Stdout,
+    rc::Rc,
+    cell::RefCell,
+    borrow::BorrowMut
+};
 
 use tui::{
     backend::CrosstermBackend,
@@ -13,7 +17,7 @@ use crate::io::adapters::bluetooth::Device;
 use crate::util::StatefulList;
 
 pub struct Application {
-    store: Store,
+    store: Rc<RefCell<Store>>,
     screens: Vec<Box<dyn Screenable>>,
     screen_index: usize,
     pub devices: StatefulList<Device>,
@@ -21,7 +25,7 @@ pub struct Application {
 }
 
 impl Application {
-    pub fn new(store: Store, screens: Vec<Box<dyn Screenable>>, devices: Vec<Device>) -> Self {
+    pub fn new(store: Rc<RefCell<Store>>, screens: Vec<Box<dyn Screenable>>, devices: Vec<Device>) -> Self {
         Application {
             store,
             screens,

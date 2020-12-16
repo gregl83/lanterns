@@ -10,10 +10,11 @@ use std::{
         stdout,
         Write
     },
+    rc::Rc,
+    cell::RefCell
 };
 
 use log::{LevelFilter};
-
 use crossterm::{
     event::{
         EnableMouseCapture,
@@ -28,7 +29,6 @@ use crossterm::{
         LeaveAlternateScreen,
     },
 };
-
 use tui::{
     backend::CrosstermBackend,
     Terminal,
@@ -72,22 +72,15 @@ fn main() -> Result<(), Box<dyn Error>> {
     execute!(stdout, EnterAlternateScreen, EnableMouseCapture)?;
 
     let backend = CrosstermBackend::new(stdout);
-
     let mut terminal = Terminal::new(backend)?;
-
     let events = Events::new();
-    let store = Store::new();
-
-    // fixme - rc / mutex store sharing
+    let store = Rc::new(RefCell::new(Store::new()));
     let screens: Vec<Box<dyn Screenable>> = vec![
-        Box::new(Dashboard::new(store)),
-        Box::new(Connection::new(store)),
-        Box::new(Communicate::new(store)),
+        Box::new(Dashboard::new(Rc::clone(&store))),
+        Box::new(Connection::new(Rc::clone(&store))),
+        Box::new(Communicate::new(Rc::clone(&store))),
     ];
-
-    let mut app = Application::new(store, screens, devices);
-
-    // todo - state management using Mutex
+    let mut app = Application::new(Rc::clone(&store), screens, devices);
 
     terminal.clear()?;
 

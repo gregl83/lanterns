@@ -9,7 +9,7 @@ pub trait Module {
         // todo - init module specific store
     }
 
-    fn generate() -> ListItem {
+    fn generate() {
         // todo - build widgets
     }
 }
