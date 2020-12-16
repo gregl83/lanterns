@@ -20,19 +20,21 @@ use crate::gui::modules::info::draw_info_bar;
 use crate::io::adapters::bluetooth::Device;
 
 pub struct Dashboard {
-    store: Rc<RefCell<Store>>
+    store: Rc<RefCell<Store>>,
+    pub devices: StatefulList<Device>,
 }
 
 impl Dashboard {
-    pub fn new(store: Rc<RefCell<Store>>) -> Self {
+    pub fn new(store: Rc<RefCell<Store>>, devices: Vec<Device>) -> Self {
         Dashboard {
             store,
+            devices: StatefulList::new(devices)
         }
     }
 }
 
 impl Screenable for Dashboard {
-    fn draw(&mut self, state: &mut StatefulList<Device>, f: &mut Frame<CrosstermBackend<Stdout>>) {
+    fn draw(&mut self, f: &mut Frame<CrosstermBackend<Stdout>>) {
         let chunks = Layout::default()
             .direction(Direction::Vertical)
             .constraints([
@@ -43,19 +45,19 @@ impl Screenable for Dashboard {
             .split(f.size());
 
         f.render_stateful_widget(
-            draw_bluetooth_device_selection(state.items.iter()),
+            draw_bluetooth_device_selection(self.devices.items.iter()),
             chunks[0],
-            &mut state.state
+            &mut self.devices.state
         );
         f.render_stateful_widget(
             draw_info_bar(),
             chunks[1],
-            &mut state.state
+            &mut self.devices.state
         );
         f.render_stateful_widget(
             draw_message_input(),
             chunks[2],
-            &mut state.state
+            &mut self.devices.state
         );
     }
 }

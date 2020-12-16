@@ -20,40 +20,38 @@ pub struct Application {
     store: Rc<RefCell<Store>>,
     screens: Vec<Box<dyn Screenable>>,
     screen_index: usize,
-    pub devices: StatefulList<Device>,
     pub should_quit: bool,
 }
 
 impl Application {
-    pub fn new(store: Rc<RefCell<Store>>, screens: Vec<Box<dyn Screenable>>, devices: Vec<Device>) -> Self {
+    pub fn new(store: Rc<RefCell<Store>>, screens: Vec<Box<dyn Screenable>>) -> Self {
         Application {
             store,
             screens,
             screen_index: 0,
-            devices: StatefulList::new(devices),
             should_quit: false,
         }
     }
 
     pub fn draw(&mut self, f: &mut Frame<CrosstermBackend<Stdout>>) {
         let screen: &mut dyn Screenable = self.screens[self.screen_index].borrow_mut();
-        screen.draw(&mut self.devices, f);
+        screen.draw(f);
     }
 
     pub fn on_tick(&mut self) { }
 
     pub fn on_up(&mut self) {
-        self.devices.previous();
+        //self.devices.previous();
     }
 
     pub fn on_right(&mut self) { }
 
     pub fn on_down(&mut self) {
-        self.devices.next();
+        //self.devices.next();
     }
 
     pub fn on_left(&mut self) {
-        self.devices.unselect();
+        //self.devices.unselect();
     }
 
     pub fn on_key(&mut self, c: char) {
@@ -69,8 +67,8 @@ impl Application {
     }
 
     pub fn on_return(&mut self) {
-        let _device = self.devices.current().unwrap();
+        // let _device = self.devices.current().unwrap();
 
-        // todo - set device
+        // fixme - propagate and set device
     }
 }

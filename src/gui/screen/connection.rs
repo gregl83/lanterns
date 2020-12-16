@@ -12,7 +12,6 @@ use tui::{
 };
 
 use crate::gui::store::Store;
-use crate::util::StatefulList;
 use crate::gui::screen::Screenable;
 use crate::io::adapters::bluetooth::Device;
 
@@ -23,11 +22,11 @@ pub struct Connection {
 impl Connection {
     pub fn new(store: Rc<RefCell<Store>>) -> Self {
         Connection {
-            store,
+            store
         }
     }
 }
 
 impl Screenable for Connection {
-    fn draw(&mut self, state: &mut StatefulList<Device>, f: &mut Frame<CrosstermBackend<Stdout>>) {}
+    fn draw(&mut self, f: &mut Frame<CrosstermBackend<Stdout>>) {}
 }

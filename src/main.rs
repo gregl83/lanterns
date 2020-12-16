@@ -70,17 +70,16 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let mut stdout = stdout();
     execute!(stdout, EnterAlternateScreen, EnableMouseCapture)?;
-
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
     let events = Events::new();
     let store = Rc::new(RefCell::new(Store::new()));
     let screens: Vec<Box<dyn Screenable>> = vec![
-        Box::new(Dashboard::new(Rc::clone(&store))),
+        Box::new(Dashboard::new(Rc::clone(&store), devices)),
         Box::new(Connection::new(Rc::clone(&store))),
         Box::new(Communicate::new(Rc::clone(&store))),
     ];
-    let mut app = Application::new(Rc::clone(&store), screens, devices);
+    let mut app = Application::new(Rc::clone(&store), screens);
 
     terminal.clear()?;
 

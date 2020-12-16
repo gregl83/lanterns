@@ -12,7 +12,6 @@ use tui::{
 };
 
 use crate::gui::store::Store;
-use crate::util::StatefulList;
 use crate::gui::screen::Screenable;
 use crate::io::adapters::bluetooth::Device;
 
@@ -29,5 +28,5 @@ impl Communicate {
 }
 
 impl Screenable for Communicate {
-    fn draw(&mut self, state: &mut StatefulList<Device>, f: &mut Frame<CrosstermBackend<Stdout>>) {}
+    fn draw(&mut self, f: &mut Frame<CrosstermBackend<Stdout>>) {}
 }
