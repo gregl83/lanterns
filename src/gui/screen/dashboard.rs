@@ -50,7 +50,9 @@ impl Screenable for Dashboard {
             KeyCode::Left => {},
             KeyCode::Up => {},
             KeyCode::Down => {},
-            KeyCode::Enter => {},
+            KeyCode::Enter => {
+                self.store.borrow_mut().welcomed = true;
+            },
             _ => {}
         }
     }
