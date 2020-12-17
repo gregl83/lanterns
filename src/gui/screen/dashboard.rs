@@ -40,7 +40,7 @@ impl Screenable for Dashboard {
             .split(f.size());
 
         f.render_widget(
-            draw_welcome_message(),
+            draw_welcome_message(f.size().height),
             chunks[0]
         );
     }

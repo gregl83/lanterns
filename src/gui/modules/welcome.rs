@@ -18,13 +18,13 @@ use tui::{
     }
 };
 
-pub fn draw_welcome_message() -> Paragraph<'static> {
+pub fn draw_welcome_message(height: u16) -> Paragraph<'static> {
     let text = vec![
         Spans::from(vec![
             Span::raw("Lanterns"),
         ]),
         Spans::from(vec![
-            Span::raw(""),
+            Span::raw("")
         ]),
         Spans::from(vec![
             Span::styled("Private Communications No Holds Barred",Style::default().add_modifier(Modifier::ITALIC)),
