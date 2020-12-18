@@ -11,7 +11,8 @@ use std::{
         Write
     },
     rc::Rc,
-    cell::RefCell
+    cell::RefCell,
+    collections::HashMap
 };
 
 use log::{LevelFilter};
@@ -37,6 +38,10 @@ use tui::{
 use crate::logger::Log;
 use crate::gui::application::Application;
 use crate::gui::store::Store;
+use crate::gui::router::{
+    Route,
+    Router,
+};
 use crate::gui::screen::{
     Screenable,
     dashboard::Dashboard,
@@ -74,12 +79,15 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut terminal = Terminal::new(backend)?;
     let events = Events::new();
     let store = Rc::new(RefCell::new(Store::new()));
-    let screens: Vec<Box<dyn Screenable>> = vec![
-        Box::new(Dashboard::new(Rc::clone(&store))),
-        Box::new(Connection::new(Rc::clone(&store), devices)),
-        Box::new(Communicate::new(Rc::clone(&store))),
-    ];
-    let mut app = Application::new(Rc::clone(&store), screens);
+    let router = Router::new(
+        Rc::clone(&store),
+        vec![
+            (Route::Dashboard, Box::new(Dashboard::new(Rc::clone(&store)))),
+            (Route::Connection, Box::new(Connection::new(Rc::clone(&store), devices))),
+            (Route::Communicate, Box::new(Communicate::new(Rc::clone(&store))))
+        ]
+    );
+    let mut app = Application::new(Rc::clone(&store), router);
 
     terminal.clear()?;
 
