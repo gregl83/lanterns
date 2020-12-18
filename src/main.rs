@@ -65,10 +65,6 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let adapter = bluetooth::Adapter::new();
 
-    println!("Searching for bluetooth devices...");
-
-    let devices = adapter.discover_devices().unwrap();
-
     // starting tui-rs + crossterm ---
 
     enable_raw_mode()?;
@@ -83,7 +79,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         Rc::clone(&store),
         vec![
             (Route::Dashboard, Box::new(Dashboard::new(Rc::clone(&store)))),
-            (Route::Connection, Box::new(Connection::new(Rc::clone(&store), devices))),
+            (Route::Connection, Box::new(Connection::new(Rc::clone(&store), adapter))),
             (Route::Communicate, Box::new(Communicate::new(Rc::clone(&store))))
         ]
     );

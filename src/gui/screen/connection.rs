@@ -18,24 +18,39 @@ use crate::gui::screen::Screenable;
 use crate::gui::modules::connection::draw_bluetooth_device_selection;
 use crate::gui::modules::message::draw_message_input;
 use crate::gui::modules::info::draw_info_bar;
-use crate::io::adapters::bluetooth::Device;
+use crate::io::adapters::{
+    Discoverable,
+    bluetooth::{
+        Device,
+        Adapter
+    }
+};
 
 pub struct Connection {
     store: Rc<RefCell<Store>>,
+    adapter: Adapter,
     pub devices: StatefulList<Device>,
+    initialized: bool
 }
 
 impl Connection {
-    pub fn new(store: Rc<RefCell<Store>>, devices: Vec<Device>) -> Self {
+    pub fn new(store: Rc<RefCell<Store>>, adapter: Adapter) -> Self {
         Connection {
             store,
-            devices: StatefulList::new(devices)
+            adapter,
+            devices: StatefulList::new(Vec::new()),
+            initialized: false
         }
     }
 }
 
 impl Screenable for Connection {
     fn draw(&mut self, f: &mut Frame<CrosstermBackend<Stdout>>) {
+        if !self.initialized {
+            self.devices = StatefulList::new(self.adapter.discover_devices().unwrap());
+            self.initialized = true
+        }
+
         let chunks = Layout::default()
             .direction(Direction::Vertical)
             .constraints([
