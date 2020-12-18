@@ -15,6 +15,7 @@ use crossterm::event::KeyCode;
 use crate::gui::store::Store;
 use crate::util::StatefulList;
 use crate::gui::screen::Screenable;
+use crate::gui::modules::loading::draw_loading_message;
 use crate::gui::modules::connection::draw_bluetooth_device_selection;
 use crate::gui::modules::message::draw_message_input;
 use crate::gui::modules::info::draw_info_bar;
@@ -42,15 +43,26 @@ impl Connection {
             initialized: false
         }
     }
-}
 
-impl Screenable for Connection {
-    fn draw(&mut self, f: &mut Frame<CrosstermBackend<Stdout>>) {
-        if !self.initialized {
-            self.devices = StatefulList::new(self.adapter.discover_devices().unwrap());
-            self.initialized = true
-        }
+    fn draw_discover(&mut self, f: &mut Frame<CrosstermBackend<Stdout>>) {
+        let chunks = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints([
+                Constraint::Min(0),
+            ].as_ref())
+            .split(f.size());
 
+        f.render_widget(
+            draw_loading_message(
+                f.size().height,
+                5,
+                "Searching For Bluetooth Devices"
+            ),
+            chunks[0]
+        );
+    }
+
+    fn draw_devices(&mut self, f: &mut Frame<CrosstermBackend<Stdout>>) {
         let chunks = Layout::default()
             .direction(Direction::Vertical)
             .constraints([
@@ -76,6 +88,19 @@ impl Screenable for Connection {
             &mut self.devices.state
         );
     }
+}
+
+impl Screenable for Connection {
+    fn draw(&mut self, f: &mut Frame<CrosstermBackend<Stdout>>) {
+        if self.initialized == true {
+            self.draw_devices(f);
+        } else {
+            self.draw_discover(f);
+            // fixme - move discovery to new thread
+            // self.devices = StatefulList::new(self.adapter.discover_devices().unwrap());
+            self.initialized = true;
+        }
+    }
 
     fn on_key(&mut self, key_code: KeyCode) {
         match key_code {
@@ -83,7 +108,7 @@ impl Screenable for Connection {
             KeyCode::Up => self.devices.previous(),
             KeyCode::Down => self.devices.next(),
             KeyCode::Enter => {
-                let _device = self.devices.current().unwrap();
+                //let _device = self.devices.current().unwrap();
             },
             _ => {}
         }
