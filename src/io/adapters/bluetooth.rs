@@ -9,13 +9,14 @@ use crate::io::adapters::{
     Connectable,
 };
 
+const BLUETOOTH_DISCOVERY_TIME: u64 = 5000;
+
 pub fn get_device_paths(
     adapter: &BluetoothAdapter,
     discovery_session: &BluetoothDiscoverySession
 ) -> Result<Vec<String>, Box<dyn Error>> {
-    thread::sleep(Duration::from_millis(200));
     discovery_session.start_discovery()?;
-    thread::sleep(Duration::from_millis(5000));
+    thread::sleep(Duration::from_millis(BLUETOOTH_DISCOVERY_TIME));
     Ok(adapter.get_device_list()?)
 }
 

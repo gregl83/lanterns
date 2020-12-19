@@ -31,6 +31,7 @@ pub struct Connection {
     store: Rc<RefCell<Store>>,
     adapter: Adapter,
     pub devices: StatefulList<Device>,
+    rendered: bool,
     initialized: bool
 }
 
@@ -40,6 +41,7 @@ impl Connection {
             store,
             adapter,
             devices: StatefulList::new(Vec::new()),
+            rendered: false,
             initialized: false
         }
     }
@@ -96,9 +98,14 @@ impl Screenable for Connection {
             self.draw_devices(f);
         } else {
             self.draw_discover(f);
-            // fixme - move discovery to new thread
-            // self.devices = StatefulList::new(self.adapter.discover_devices().unwrap());
-            self.initialized = true;
+
+            // wait iteration for discover module to render frame prior to blocking call
+            if self.rendered == true {
+                self.devices = StatefulList::new(self.adapter.discover_devices().unwrap());
+                self.initialized = true;
+            }
+
+            self.rendered = true;
         }
     }
 
