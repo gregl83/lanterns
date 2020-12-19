@@ -12,6 +12,7 @@ use std::borrow::BorrowMut;
 pub enum Route {
     Dashboard,
     Connection,
+    Call,
     Communicate,
 }
 
@@ -48,7 +49,9 @@ impl Router {
         let store = store_ref.borrow();
         match *store {
             Store {welcomed: false, ..} => self.find_screen(Route::Dashboard).borrow_mut(),
-            _ => self.find_screen(Route::Connection).borrow_mut()
+            Store {welcomed: true, connected: false, ..} => self.find_screen(Route::Connection).borrow_mut(),
+            Store {welcomed: true, connected: true, in_call: false} => self.find_screen(Route::Communicate).borrow_mut(),
+            Store {welcomed: true, connected: true, in_call: true} => self.find_screen(Route::Call).borrow_mut(),
         }
     }
 }

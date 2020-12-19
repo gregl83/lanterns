@@ -1,6 +1,7 @@
 pub struct Store {
     pub welcomed: bool,
     pub connected: bool,
+    pub in_call: bool,
 }
 
 impl Store {
@@ -8,6 +9,7 @@ impl Store {
         Store {
             welcomed: false,
             connected: false,
+            in_call: false,
         }
     }
 }

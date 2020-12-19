@@ -47,6 +47,7 @@ use crate::gui::screen::{
     dashboard::Dashboard,
     connection::Connection,
     communicate::Communicate,
+    call::Call,
 };
 use crate::io::adapters::{
     Discoverable,
@@ -80,7 +81,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         vec![
             (Route::Dashboard, Box::new(Dashboard::new(Rc::clone(&store)))),
             (Route::Connection, Box::new(Connection::new(Rc::clone(&store), adapter))),
-            (Route::Communicate, Box::new(Communicate::new(Rc::clone(&store))))
+            (Route::Communicate, Box::new(Communicate::new(Rc::clone(&store)))),
+            (Route::Call, Box::new(Call::new(Rc::clone(&store))))
         ]
     );
     let mut app = Application::new(Rc::clone(&store), router);

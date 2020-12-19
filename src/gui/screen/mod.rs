@@ -1,6 +1,7 @@
 pub mod dashboard;
 pub mod connection;
 pub mod communicate;
+pub mod call;
 
 use std::io::Stdout;
 
