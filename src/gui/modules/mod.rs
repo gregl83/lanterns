@@ -1,5 +1,3 @@
-use tui::widgets::ListItem;
-
 pub mod welcome;
 pub mod loading;
 pub mod connection;
