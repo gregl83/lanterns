@@ -39,7 +39,10 @@ impl Application {
 
     pub fn draw(&mut self, f: &mut Frame<CrosstermBackend<Stdout>>) {
         let screen = self.router.get_screen();
-        screen.draw(f);
+        match screen.draw(f) {
+            Ok(_) => {},
+            Err(e) => self.should_quit = true,
+        }
     }
 
     pub fn on_tick(&mut self) { }

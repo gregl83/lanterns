@@ -3,7 +3,10 @@ pub mod connection;
 pub mod communicate;
 pub mod call;
 
-use std::io::Stdout;
+use std::{
+    io::Stdout,
+    fmt::Error
+};
 
 use tui::{
     backend::CrosstermBackend,
@@ -18,7 +21,7 @@ use crate::gui::store::Store;
 use crate::io::adapters::bluetooth::Device;
 
 pub trait Screenable {
-    fn draw(&mut self, f: &mut Frame<CrosstermBackend<Stdout>>);
+    fn draw(&mut self, f: &mut Frame<CrosstermBackend<Stdout>>) -> Result<(), Error>;
 
     fn on_key(&mut self, key_code: KeyCode) {
         // do nothing

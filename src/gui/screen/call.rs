@@ -1,7 +1,8 @@
 use std::{
     io::Stdout,
     rc::Rc,
-    cell::RefCell
+    cell::RefCell,
+    fmt::Error
 };
 
 use tui::{
@@ -28,5 +29,7 @@ impl Call {
 }
 
 impl Screenable for Call {
-    fn draw(&mut self, f: &mut Frame<CrosstermBackend<Stdout>>) {}
+    fn draw(&mut self, f: &mut Frame<CrosstermBackend<Stdout>>) -> Result<(), Error> {
+        Ok(())
+    }
 }

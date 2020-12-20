@@ -52,7 +52,7 @@ impl Discoverable for Adapter {
         let device_paths = get_device_paths(
             &adapter,
             &discovery_session
-        ).unwrap();
+        )?;
 
         let mut devices = Vec::new();
 

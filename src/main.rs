@@ -112,6 +112,13 @@ fn main() -> Result<(), Box<dyn Error>> {
             }
         }
         if app.should_quit {
+            disable_raw_mode()?;
+            execute!(
+                terminal.backend_mut(),
+                LeaveAlternateScreen,
+                DisableMouseCapture
+            )?;
+            terminal.show_cursor()?;
             break;
         }
     }

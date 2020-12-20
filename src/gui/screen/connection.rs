@@ -1,7 +1,11 @@
 use std::{
+    process::exit,
     io::Stdout,
     rc::Rc,
-    cell::RefCell
+    cell::RefCell,
+    time::Duration,
+    thread,
+    fmt::Error
 };
 
 use tui::{
@@ -26,13 +30,16 @@ use crate::io::adapters::{
         Adapter
     }
 };
+use std::io::ErrorKind;
+
+const BLUETOOTH_ERROR_TIME: u64 = 2000;
 
 pub struct Connection {
     store: Rc<RefCell<Store>>,
     adapter: Adapter,
     pub devices: StatefulList<Device>,
     rendered: bool,
-    initialized: bool
+    failed: bool,
 }
 
 impl Connection {
@@ -42,7 +49,7 @@ impl Connection {
             adapter,
             devices: StatefulList::new(Vec::new()),
             rendered: false,
-            initialized: false
+            failed: false,
         }
     }
 
@@ -58,7 +65,25 @@ impl Connection {
             draw_loading_message(
                 f.size().height,
                 5,
-                "Searching For Bluetooth Devices"
+                "Searching for Bluetooth devices."
+            ),
+            chunks[0]
+        );
+    }
+
+    fn draw_discover_error(&mut self, f: &mut Frame<CrosstermBackend<Stdout>>) {
+        let chunks = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints([
+                Constraint::Min(0),
+            ].as_ref())
+            .split(f.size());
+
+        f.render_widget(
+            draw_loading_message(
+                f.size().height,
+                5,
+                "Please make sure Bluetooth is enabled."
             ),
             chunks[0]
         );
@@ -93,20 +118,31 @@ impl Connection {
 }
 
 impl Screenable for Connection {
-    fn draw(&mut self, f: &mut Frame<CrosstermBackend<Stdout>>) {
-        if self.initialized == true {
-            self.draw_devices(f);
-        } else {
+    fn draw(&mut self, f: &mut Frame<CrosstermBackend<Stdout>>) -> Result<(), Error> {
+        if self.failed {
+            thread::sleep(Duration::from_millis(BLUETOOTH_ERROR_TIME));
+            return Err(Error)
+        }
+
+        if self.devices.items.is_empty() {
             self.draw_discover(f);
 
             // wait iteration for discover module to render frame prior to blocking call
             if self.rendered == true {
-                self.devices = StatefulList::new(self.adapter.discover_devices().unwrap());
-                self.initialized = true;
+                match self.adapter.discover_devices() {
+                    Ok(devices) => self.devices = StatefulList::new(devices),
+                    Err(e) => {
+                        self.failed = true;
+                        self.draw_discover_error(f)
+                    },
+                }
             }
-
             self.rendered = true;
+        } else {
+            self.draw_devices(f);
         }
+
+        Ok(())
     }
 
     fn on_key(&mut self, key_code: KeyCode) {

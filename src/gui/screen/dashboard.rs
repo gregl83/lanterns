@@ -1,7 +1,8 @@
 use std::{
     io::Stdout,
     rc::Rc,
-    cell::RefCell
+    cell::RefCell,
+    fmt::Error
 };
 
 use tui::{
@@ -31,7 +32,7 @@ impl Dashboard {
 }
 
 impl Screenable for Dashboard {
-    fn draw(&mut self, f: &mut Frame<CrosstermBackend<Stdout>>) {
+    fn draw(&mut self, f: &mut Frame<CrosstermBackend<Stdout>>) -> Result<(), Error> {
         let chunks = Layout::default()
             .direction(Direction::Horizontal)
             .constraints([
@@ -43,6 +44,8 @@ impl Screenable for Dashboard {
             draw_welcome_message(f.size().height),
             chunks[0]
         );
+
+        Ok(())
     }
 
     fn on_key(&mut self, key_code: KeyCode) {
