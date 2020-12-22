@@ -7,12 +7,13 @@ mod logger;
 use std::{
     error::Error,
     io::{
+        Stdout,
+        Write,
         stdout,
-        Write
     },
     rc::Rc,
     cell::RefCell,
-    collections::HashMap
+    collections::HashMap,
 };
 
 use log::{LevelFilter};
@@ -89,18 +90,22 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     terminal.clear()?;
 
+    let mut shutdown = |mut terminal: Terminal<CrosstermBackend<Stdout>>| {
+        disable_raw_mode();
+        execute!(
+                terminal.backend_mut(),
+                LeaveAlternateScreen,
+                DisableMouseCapture
+        );
+        terminal.show_cursor();
+    };
+
     loop {
         terminal.draw(|f| app.draw(f))?;
         match events.next()? {
             Event::Input(event) => match event.code {
                 KeyCode::Char('q') => {
-                    disable_raw_mode()?;
-                    execute!(
-                        terminal.backend_mut(),
-                        LeaveAlternateScreen,
-                        DisableMouseCapture
-                    )?;
-                    terminal.show_cursor()?;
+                    shutdown(terminal);
                     break;
                 }
                 e => {
@@ -112,13 +117,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             }
         }
         if app.should_quit {
-            disable_raw_mode()?;
-            execute!(
-                terminal.backend_mut(),
-                LeaveAlternateScreen,
-                DisableMouseCapture
-            )?;
-            terminal.show_cursor()?;
+            shutdown(terminal);
             break;
         }
     }
