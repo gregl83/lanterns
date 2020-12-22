@@ -155,6 +155,10 @@ impl Screenable for Connection {
             KeyCode::Down => self.devices.next(),
             KeyCode::Enter => {
                 //let _device = self.devices.current().unwrap();
+
+                // todo - receive device name
+                // todo - find device object to pair
+                // todo - pair device and persist to store
             },
             _ => {}
         }
