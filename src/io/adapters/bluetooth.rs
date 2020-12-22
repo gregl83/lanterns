@@ -90,6 +90,7 @@ impl Connectable for Adapter {
         let adapter = self.get_adapter();
         let adapter_id = adapter.get_id();
         let discovery_session = self.get_discovery_session(adapter_id);
+        // fixme - deep scan without using OS to discover some devices
         let device_paths = get_device_paths(
             &adapter,
             &discovery_session
