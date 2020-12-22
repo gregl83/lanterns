@@ -72,6 +72,8 @@ impl Discoverable for Adapter {
             }
         }
 
+        discovery_session.stop_discovery();
+
         Ok(devices)
     }
 }
