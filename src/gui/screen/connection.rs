@@ -36,14 +36,14 @@ const BLUETOOTH_ERROR_TIME: u64 = 2000;
 
 pub struct Connection {
     store: Rc<RefCell<Store>>,
-    adapter: Adapter,
+    adapter: Rc<RefCell<Adapter>>,
     pub devices: StatefulList<Device>,
     rendered: bool,
     failed: bool,
 }
 
 impl Connection {
-    pub fn new(store: Rc<RefCell<Store>>, adapter: Adapter) -> Self {
+    pub fn new(store: Rc<RefCell<Store>>, adapter: Rc<RefCell<Adapter>>) -> Self {
         Connection {
             store,
             adapter,
@@ -129,7 +129,10 @@ impl Screenable for Connection {
 
             // wait iteration for discover module to render frame prior to blocking call
             if self.rendered == true {
-                match self.adapter.discover_devices() {
+                let devices = {
+                    self.adapter.borrow_mut().discover_devices()
+                };
+                match devices {
                     Ok(devices) => self.devices = StatefulList::new(devices),
                     Err(e) => {
                         self.failed = true;

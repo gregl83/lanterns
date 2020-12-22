@@ -65,7 +65,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     // todo - dynamic level filter (debug mode)
     log::set_logger(&LOGGER).map(|()| log::set_max_level(LevelFilter::Debug)).unwrap();
 
-    let adapter = bluetooth::Adapter::new();
+    let adapter = Rc::new(RefCell::new(bluetooth::Adapter::new()));
 
     // starting tui-rs + crossterm ---
 
@@ -81,8 +81,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         Rc::clone(&store),
         vec![
             (Route::Dashboard, Box::new(Dashboard::new(Rc::clone(&store)))),
-            (Route::Connection, Box::new(Connection::new(Rc::clone(&store), adapter))),
-            (Route::Communicate, Box::new(Communicate::new(Rc::clone(&store)))),
+            (Route::Connection, Box::new(Connection::new(Rc::clone(&store), Rc::clone(&adapter)))),
+            (Route::Communicate, Box::new(Communicate::new(Rc::clone(&store), Rc::clone(&adapter)))),
             (Route::Call, Box::new(Call::new(Rc::clone(&store))))
         ]
     );
@@ -90,7 +90,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     terminal.clear()?;
 
-    let mut shutdown = |mut terminal: Terminal<CrosstermBackend<Stdout>>| {
+    let shutdown = |mut terminal: Terminal<CrosstermBackend<Stdout>>| {
         disable_raw_mode();
         execute!(
                 terminal.backend_mut(),
