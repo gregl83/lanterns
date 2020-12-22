@@ -98,6 +98,12 @@ impl Connectable for Adapter {
         'device_loop: for d in device_paths {
             let device = BluetoothDevice::new(&self.session, d.clone());
 
+            println!("{:?} {:?}", device.get_id(), key);
+
+            if device.get_id() != key {
+                continue;
+            }
+
             println!(
                 "Device: Id: {} Address: {:?} Rssi: {:?} Name: {:?}",
                 device.get_id(),
@@ -105,10 +111,6 @@ impl Connectable for Adapter {
                 device.get_rssi(),
                 device.get_name()
             );
-
-            if device.get_id() != key {
-                continue;
-            }
 
             if let Err(e) = device.pair() {
                 println!("  Error on pairing: {:?}", e);
@@ -174,7 +176,7 @@ impl Connectable for Adapter {
 
 #[derive(Debug)]
 pub struct Device {
-    id: String,
+    pub id: String,
     address: String,
     pub name: String,
 }

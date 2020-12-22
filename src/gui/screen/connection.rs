@@ -147,7 +147,7 @@ impl Screenable for Connection {
             KeyCode::Enter => {
                 let device = self.devices.current().unwrap();
 
-                &self.adapter.borrow_mut().connect(device.name.clone().as_str());
+                &self.adapter.borrow_mut().connect(device.id.clone().as_str());
 
                 // todo - pair device and persist to store
             },
