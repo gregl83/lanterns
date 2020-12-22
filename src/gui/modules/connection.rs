@@ -17,10 +17,11 @@ pub fn draw_bluetooth_device_selection(devices: Iter<'_, Device>) -> List<'stati
         })
         .collect();
     List::new(items)
-        .block(Block::default().borders(Borders::ALL).title("Devices"))
+        .block(Block::default().borders(Borders::ALL).title("Select Device"))
         .highlight_style(
             Style::default()
-                .bg(Color::LightGreen)
+                .bg(Color::Rgb(238, 238, 238))
+                .fg(Color::Rgb(0, 0, 0))
                 .add_modifier(Modifier::BOLD),
         )
         .highlight_symbol(">> ")
