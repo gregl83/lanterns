@@ -16,7 +16,7 @@ use crate::io::adapters::{
     Connectable,
 };
 
-const BLUETOOTH_DISCOVERY_TIME: u64 = 5000;
+const BLUETOOTH_DISCOVERY_TIME: u64 = 2000;
 
 pub fn get_device_paths(
     adapter: &BluetoothAdapter,

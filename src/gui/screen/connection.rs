@@ -10,7 +10,11 @@ use std::{
 
 use tui::{
     backend::CrosstermBackend,
-    layout::{Constraint, Direction, Layout},
+    layout::{
+        Constraint,
+        Direction,
+        Layout
+    },
     widgets::ListState,
     Frame,
 };
@@ -24,6 +28,7 @@ use crate::gui::modules::connection::draw_bluetooth_device_selection;
 use crate::gui::modules::message::draw_message_input;
 use crate::gui::modules::info::draw_info_bar;
 use crate::io::adapters::{
+    Connectable,
     Discoverable,
     bluetooth::{
         Device,
@@ -154,10 +159,10 @@ impl Screenable for Connection {
             KeyCode::Up => self.devices.previous(),
             KeyCode::Down => self.devices.next(),
             KeyCode::Enter => {
-                //let _device = self.devices.current().unwrap();
+                let device = self.devices.current().unwrap();
 
-                // todo - receive device name
-                // todo - find device object to pair
+                &self.adapter.borrow_mut().connect(device.name.clone().as_str());
+
                 // todo - pair device and persist to store
             },
             _ => {}
